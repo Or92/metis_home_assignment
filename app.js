@@ -10,8 +10,8 @@ globalThis['logger'] = logger;
 
 (async () => {
     try {
-        // console.log('init db...');
-        // await DB.authenticate();
+        console.log('init db...');
+        await DB.authenticate();
 
         app.get('/facts', generateOpId, async function factsController(req, res) {
             const method_name = 'factsController';
@@ -25,7 +25,7 @@ globalThis['logger'] = logger;
                 }
                 const rule_service = new RuleService();
                 logger.info(op_id, `${method_name} - calling rule_service/testRules with: `, { table_name });
-                const data = await rule_service.testRules(table_name);
+                const data = await rule_service.testRules(op_id,table_name);
                 res.json({ success: true, data });
                 return;
             }
@@ -41,7 +41,7 @@ globalThis['logger'] = logger;
         app.listen(PORT || 3000);
     }
     catch (e) {
-        logger.error();
+        console.error(e);
         process.exit(1);
     }
 })();

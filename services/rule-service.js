@@ -17,9 +17,9 @@ class RuleService {
         const method_name = `${this.className}/numberOfRows`;
 
         try {
-            const query = `SELECT count(*) FROM ${tableName}`;
-            const [results, metadata] = await sequelize.query(query);
-            return results;
+            const query = `SELECT count(*) AS count FROM ${tableName}`;
+            const [[{count}], _] = await sequelize.query(query);
+            return count;
         }
         catch (e) {
             logger.error(op_id, `${method_name} - error: `, e);
@@ -30,12 +30,12 @@ class RuleService {
     async #numberOfIndexes(op_id, tableName) {
         const method_name = `${this.className}/numberOfIndexes`;
         try {
-            const query = `SELECT count(*) 
+            const query = `SELECT count(*) AS count
 FROM  sys.indexes AS IND
 WHERE object_id = object_ID('${tableName}')
 AND index_id != 0`;
-            const [results, metadata] = await sequelize.query(query);
-            return results;
+            const [[{ count }], _] = await sequelize.query(query);
+            return count;
         }
         catch (e) {
             logger.error(op_id, `${method_name} - error: `, e);
@@ -49,12 +49,12 @@ AND index_id != 0`;
             const query = `SELECT CASE
 WHEN Count(index_id) = 1 THEN 'true'
 	ELSE 'false'
-	END
+	END AS count
 FROM sys.indexes 
 WHERE object_id = object_id('${tableName}') 
 AND is_primary_key = 1;`;
-            const [results, metadata] = await sequelize.query(query);
-            return results;
+            const [[{ count }], _] = await sequelize.query(query);
+            return count;
         }
         catch (e) {
             logger.error(op_id, `${method_name} - error: `, e);
@@ -65,7 +65,7 @@ AND is_primary_key = 1;`;
     async #primaryKeyCountColumns(op_id, tableName) {
         const method_name = `${this.className}/primaryKeyCountColumns`;
         try {
-            const query = `SELECT COUNT(INC.column_id)
+            const query = `SELECT COUNT(INC.column_id) AS count
 FROM sys.indexes as IND
 		INNER JOIN sys.index_columns as INC
 			ON IND.object_id = INC.object_id
@@ -73,8 +73,8 @@ FROM sys.indexes as IND
 WHERE IND.object_id = object_id('${tableName}') 
 	AND IND.is_primary_key = 1;
 `;
-            const [results, metadata] = await sequelize.query(query);
-            return results;
+            const [[{ count }], _] = await sequelize.query(query);
+            return count;
         }
         catch (e) {
             logger.error(op_id, `${method_name} - error: `, e);
